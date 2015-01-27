@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="">
+	<select id="getBoardList" resultType="Board">
+		select * from Board
+	</select>
+	
+	<select id="getBoardFileList" resultType="BoardFile">
+		select * from boardfile
+	</select>
+	
+	<select id="getBoardListPaging"  resultType="Board"
+		parameterType="java.util.Map">
+		select * from (
+		select a.*, rownum rnum 
+		from
+		(select * from BOARD
+		order by num desc) a)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<insert id="insertBoard" parameterType="Board">
+		<selectKey keyProperty="num" resultType="int"
+			order="BEFORE">
+			select board_seq.nextval from dual
+		</selectKey>
+		insert into board (
+			num, userid, title, regdate,
+			content, count, filename, ref
+		)
+		values (
+			#{num}, #{userid}, #{title}, sysdate,
+			#{content}, #{count}, #{filename}, board_seq.currval
+		)
+	</insert>
+	
+	<insert id="insertBoardFile" parameterType="BoardFile">
+		insert into boardfile (
+			num, boardnum, filename
+		)
+		values (
+			boardfile_seq.nextval, #{boardnum}, #{filename}
+		)
+	</insert>
+	
+	
+	<update id="updateBoard" parameterType="Board">
+		update board
+		set
+			title = #{title}, filename=#{filename},
+			content=#{content}
+		where num = #{num}
+	</update>
+	<delete id="deleteBoard" parameterType="Integer">
+		delete from board
+		where num = #{num}
+	</delete>
+	
+	<select id="getBoardCount" resultType="Integer">
+		select count(*)
+		from board
+	</select>
+	
+	<update id="updateCount" parameterType="Integer">
+		update board
+		set count = count + 1
+		where num = #{num}
+	</update>
+	
+	<select id="getBoard" resultType="Board" parameterType="Integer">
+		select * from board
+		where num = #{num}
+	</select>
+</mapper>	
+
+
+
+
+
+
+
+
+
+
+
+
